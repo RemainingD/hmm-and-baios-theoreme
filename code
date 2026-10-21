@@ -1,0 +1,20 @@
+def bayes_update(prior, p_blocked_given_obj, p_blocked_given_clear):
+    p_blocked = (p_blocked_given_obj * prior) + (p_blocked_given_clear * (1 - prior))
+    return (p_blocked_given_obj * prior) / p_blocked
+
+def hmm_step(belief_o, obs, p_b_o=0.80, p_b_c=0.20):
+    pred_o = 0.70 * belief_o + 0.20 * (1 - belief_o)
+    like_o = p_b_o if obs == "BLOCKED" else (1 - p_b_o)
+    like_c = p_b_c if obs == "BLOCKED" else (1 - p_b_c)
+    score_o = pred_o * like_o
+    score_c = (1 - pred_o) * like_c
+    post_o = score_o / (score_o + score_c)
+    return pred_o, post_o
+
+# t1-t4 есептеу
+obs_list = ["BLOCKED", "CLEAR", "BLOCKED", "BLOCKED"]
+belief = 0.30
+for t, obs in enumerate(obs_list, 1):
+    pred, post = hmm_step(belief, obs)
+    print(f"t{t} ({obs}): Pred={pred:.4f}, Post={post:.4f}")
+    belief = post
